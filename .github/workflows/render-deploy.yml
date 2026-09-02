@@ -1,0 +1,39 @@
+# Auto-deploy to Render on every push to main.
+#
+# How it works: Render exposes a deploy webhook per service. GitHub Actions
+# calls that webhook after a successful push; Render then pulls the latest
+# commit and rebuilds/deploys it.
+#
+# SET UP (one-time, ~1 minute):
+#   1. Render dashboard -> your service -> Settings -> Deploy Hooks.
+#   2. Copy the unique "Deploy Hook" URL, e.g.
+#      https://api.render.com/deploy/srv-xxx?key=yyy
+#   3. In this repo go to Settings -> Secrets and variables -> Actions and
+#      add a repository secret named RENDER_DEPLOY_HOOK with that URL.
+#   4. Done. Every push to main now redeploys automatically.
+#
+# NOTE: keep this hook URL secret. Anyone who knows it can trigger a deploy.
+
+name: Deploy to Render
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch: {}
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger Render deploy hook
+        env:
+          RENDER_DEPLOY_HOOK: ${{ secrets.RENDER_DEPLOY_HOOK }}
+        run: |
+          if [ -z "$RENDER_DEPLOY_HOOK" ]; then
+            echo "::warning::RENDER_DEPLOY_HOOK secret not set. Add it in "
+            echo "Settings -> Secrets and variables -> Actions to enable "
+            echo "auto-deploy."
+            exit 0
+          fi
+          curl -fsS --retry 3 --retry-delay 5 -X POST "$RENDER_DEPLOY_HOOK" \
+            || echo "::error::Deploy hook request failed"

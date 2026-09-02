@@ -53,14 +53,31 @@ Environment variables (prefix `SECAPI_`), see `config.py`:
   the app returns 403 to any request that does not carry that
   `x-rapidapi-host` header, restricting access to traffic proxied by RapidAPI
 
+## Documentation
+
+- **[Deploy walkthrough](docs/deploy-walkthrough.md)** — Render (free tier)
+  → RapidAPI registration → host-gate lock-down, with troubleshooting.
+- **[Endpoint reference](docs/endpoint-reference.md)** — every endpoint, its
+  params, and sample responses.
+- **[RapidAPI listing copy](docs/rapidapi-listing.md)** — paste-ready title,
+  description, and tags for the marketplace.
+- **[Pricing tiers](docs/rapidapi-pricing.md)** — suggested RapidAPI plans.
+- **[Code examples](docs/code-examples.md)** — consumer snippets: curl,
+  Python, JavaScript, Go.
+- **[OpenAPI spec](docs/secapi-openapi.json)** — exported 19-endpoint spec you
+  can import directly into RapidAPI.
+
 ## Marketplace deployment (RapidAPI)
 
 This app is ready to deploy behind RapidAPI:
 
 1. Deploy to any public HTTPS host (Render, Railway, Fly.io, AWS, etc.)
-   or use `uvicorn main:app` in a container.
-2. Register the API on RapidAPI with the OpenAPI spec from `/openapi.json`
-   (or `/docs` → download).
+   or use `uvicorn main:app` in a container. See the
+   [deploy walkthrough](docs/deploy-walkthrough.md) for the Render + RapidAPI
+   path (a [GitHub Actions workflow](.github/workflows/render-deploy.yml)
+   can auto-deploy on every push).
+2. Register the API on RapidAPI with the exported OpenAPI spec from
+   `docs/secapi-openapi.json`.
 3. Never publish the password-iq `/strength` endpoint's plaintext-input
    nature without a note in the description: inputs are checked locally /
    k-anonymously and never stored.
