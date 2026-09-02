@@ -1,0 +1,1043 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "SecAPI \u2014 5 Cybersecurity REST Services",
+    "description": "Five RESTful APIs that solve common cybersecurity problems:\n1. Password & breach intelligence\n2. CVE / dependency scanning\n3. IOC / indicator enrichment\n4. Threat log correlation & alerting\n5. Document / malware static analysis",
+    "version": "v1"
+  },
+  "paths": {
+    "/api/v1/password-iq/strength": {
+      "get": {
+        "tags": [
+          "password-iq"
+        ],
+        "summary": "Score a password's strength (local only, never transmitted)",
+        "operationId": "strength_api_v1_password_iq_strength_get",
+        "parameters": [
+          {
+            "name": "password",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "description": "Password to score",
+              "title": "Password"
+            },
+            "description": "Password to score"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "title": "Response Strength Api V1 Password Iq Strength Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/password-iq/breach": {
+      "post": {
+        "tags": [
+          "password-iq"
+        ],
+        "summary": "k-anonymity breach lookup (HIBP range)",
+        "description": "Check if a password has appeared in a known breach.\n\nThe password travels in the request body (never in URLs/logs). Implements\nk-anonymity: only the first 5 chars of the SHA-1 hash leave the machine.",
+        "operationId": "breach_api_v1_password_iq_breach_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PasswordIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "title": "Response Breach Api V1 Password Iq Breach Post"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/password-iq/hash/{sha1_hex}": {
+      "get": {
+        "tags": [
+          "password-iq"
+        ],
+        "summary": "Look up an arbitrary SHA-1 hash's breach count",
+        "description": "Check breach count for a full SHA-1 hash value directly.",
+        "operationId": "hash_lookup_api_v1_password_iq_hash__sha1_hex__get",
+        "parameters": [
+          {
+            "name": "sha1_hex",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 40,
+              "maxLength": 40,
+              "description": "Full SHA-1 (hex)",
+              "title": "Sha1 Hex"
+            },
+            "description": "Full SHA-1 (hex)"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "title": "Response Hash Lookup Api V1 Password Iq Hash  Sha1 Hex  Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/cve-scan/cve/{cve_id}": {
+      "get": {
+        "tags": [
+          "cve-scan"
+        ],
+        "summary": "Look up a single CVE by ID",
+        "operationId": "get_cve_api_v1_cve_scan_cve__cve_id__get",
+        "parameters": [
+          {
+            "name": "cve_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Cve Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "title": "Response Get Cve Api V1 Cve Scan Cve  Cve Id  Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/cve-scan/cves": {
+      "get": {
+        "tags": [
+          "cve-scan"
+        ],
+        "summary": "List known CVEs, optionally filtered by keyword",
+        "operationId": "list_cves_api_v1_cve_scan_cves_get",
+        "parameters": [
+          {
+            "name": "keyword",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Keyword"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object"
+                  },
+                  "title": "Response List Cves Api V1 Cve Scan Cves Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/cve-scan/package/{package}": {
+      "get": {
+        "tags": [
+          "cve-scan"
+        ],
+        "summary": "List CVEs affecting a package",
+        "operationId": "package_cves_api_v1_cve_scan_package__package__get",
+        "parameters": [
+          {
+            "name": "package",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Package"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object"
+                  },
+                  "title": "Response Package Cves Api V1 Cve Scan Package  Package  Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/cve-scan/scan": {
+      "post": {
+        "tags": [
+          "cve-scan"
+        ],
+        "summary": "Scan an uploaded dependency manifest for known CVEs",
+        "operationId": "scan_manifest_api_v1_cve_scan_scan_post",
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "$ref": "#/components/schemas/Body_scan_manifest_api_v1_cve_scan_scan_post"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "title": "Response Scan Manifest Api V1 Cve Scan Scan Post"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/cve-scan/osv": {
+      "post": {
+        "tags": [
+          "cve-scan"
+        ],
+        "summary": "Query the live OSV.dev database for a package/version",
+        "description": "Live vulnerability query against OSV.dev (Google). Returns raw advisories.",
+        "operationId": "osv_query_api_v1_cve_scan_osv_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OSVQueryIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "title": "Response Osv Query Api V1 Cve Scan Osv Post"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/ioc-enrich/hashes": {
+      "post": {
+        "tags": [
+          "ioc-enrich"
+        ],
+        "summary": "Compute MD5/SHA1/SHA256 of an uploaded file",
+        "operationId": "file_hashes_api_v1_ioc_enrich_hashes_post",
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "$ref": "#/components/schemas/Body_file_hashes_api_v1_ioc_enrich_hashes_post"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "title": "Response File Hashes Api V1 Ioc Enrich Hashes Post"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/ioc-enrich/hash/{value}": {
+      "get": {
+        "tags": [
+          "ioc-enrich"
+        ],
+        "summary": "Enrich a hash against the threat feed",
+        "operationId": "hash_enrich_api_v1_ioc_enrich_hash__value__get",
+        "parameters": [
+          {
+            "name": "value",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Value"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "title": "Response Hash Enrich Api V1 Ioc Enrich Hash  Value  Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/ioc-enrich/ip/{ip}": {
+      "get": {
+        "tags": [
+          "ioc-enrich"
+        ],
+        "summary": "Enrich an IP address (offline KB or AbuseIPDB)",
+        "operationId": "ip_enrich_api_v1_ioc_enrich_ip__ip__get",
+        "parameters": [
+          {
+            "name": "ip",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Ip"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "title": "Response Ip Enrich Api V1 Ioc Enrich Ip  Ip  Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/ioc-enrich/url": {
+      "get": {
+        "tags": [
+          "ioc-enrich"
+        ],
+        "summary": "Enrich a URL / domain",
+        "operationId": "url_enrich_api_v1_ioc_enrich_url_get",
+        "parameters": [
+          {
+            "name": "url",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "description": "URL or domain to enrich",
+              "title": "Url"
+            },
+            "description": "URL or domain to enrich"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "title": "Response Url Enrich Api V1 Ioc Enrich Url Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/log-correlate/ingest": {
+      "post": {
+        "tags": [
+          "log-correlate"
+        ],
+        "summary": "Ingest a single event and run correlation rules",
+        "operationId": "ingest_api_v1_log_correlate_ingest_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EventIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "title": "Response Ingest Api V1 Log Correlate Ingest Post"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/log-correlate/ingest/batch": {
+      "post": {
+        "tags": [
+          "log-correlate"
+        ],
+        "summary": "Ingest a batch of events (bulk upload)",
+        "operationId": "ingest_batch_api_v1_log_correlate_ingest_batch_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BatchIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "title": "Response Ingest Batch Api V1 Log Correlate Ingest Batch Post"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/log-correlate/events": {
+      "get": {
+        "tags": [
+          "log-correlate"
+        ],
+        "summary": "Query ingested events",
+        "operationId": "query_events_api_v1_log_correlate_events_get",
+        "parameters": [
+          {
+            "name": "source",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Source"
+            }
+          },
+          {
+            "name": "event_type",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Event Type"
+            }
+          },
+          {
+            "name": "with_alerts_only",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "boolean",
+              "default": false,
+              "title": "With Alerts Only"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 500,
+              "default": 50,
+              "title": "Limit"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object"
+                  },
+                  "title": "Response Query Events Api V1 Log Correlate Events Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/log-correlate/alerts": {
+      "get": {
+        "tags": [
+          "log-correlate"
+        ],
+        "summary": "Get raised alerts",
+        "operationId": "get_alerts_api_v1_log_correlate_alerts_get",
+        "parameters": [
+          {
+            "name": "severity",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Severity"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 500,
+              "default": 50,
+              "title": "Limit"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object"
+                  },
+                  "title": "Response Get Alerts Api V1 Log Correlate Alerts Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/log-correlate/rules": {
+      "get": {
+        "tags": [
+          "log-correlate"
+        ],
+        "summary": "List the active correlation rules",
+        "operationId": "get_rules_api_v1_log_correlate_rules_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "type": "object"
+                  },
+                  "type": "array",
+                  "title": "Response Get Rules Api V1 Log Correlate Rules Get"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/document-analysis/analyze": {
+      "post": {
+        "tags": [
+          "document-analysis"
+        ],
+        "summary": "Static-analysis a suspicious document (PDF/Office/script)",
+        "operationId": "analyze_api_v1_document_analysis_analyze_post",
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "$ref": "#/components/schemas/Body_analyze_api_v1_document_analysis_analyze_post"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "title": "Response Analyze Api V1 Document Analysis Analyze Post"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/health": {
+      "get": {
+        "tags": [
+          "meta"
+        ],
+        "summary": "Health",
+        "operationId": "health_health_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "title": "Response Health Health Get"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "BatchIn": {
+        "properties": {
+          "events": {
+            "items": {
+              "$ref": "#/components/schemas/EventIn"
+            },
+            "type": "array",
+            "title": "Events"
+          }
+        },
+        "type": "object",
+        "required": [
+          "events"
+        ],
+        "title": "BatchIn"
+      },
+      "Body_analyze_api_v1_document_analysis_analyze_post": {
+        "properties": {
+          "file": {
+            "type": "string",
+            "format": "binary",
+            "title": "File"
+          }
+        },
+        "type": "object",
+        "required": [
+          "file"
+        ],
+        "title": "Body_analyze_api_v1_document_analysis_analyze_post"
+      },
+      "Body_file_hashes_api_v1_ioc_enrich_hashes_post": {
+        "properties": {
+          "file": {
+            "type": "string",
+            "format": "binary",
+            "title": "File"
+          }
+        },
+        "type": "object",
+        "required": [
+          "file"
+        ],
+        "title": "Body_file_hashes_api_v1_ioc_enrich_hashes_post"
+      },
+      "Body_scan_manifest_api_v1_cve_scan_scan_post": {
+        "properties": {
+          "file": {
+            "type": "string",
+            "format": "binary",
+            "title": "File"
+          }
+        },
+        "type": "object",
+        "required": [
+          "file"
+        ],
+        "title": "Body_scan_manifest_api_v1_cve_scan_scan_post"
+      },
+      "EventIn": {
+        "properties": {
+          "source": {
+            "type": "string",
+            "title": "Source",
+            "description": "Log source, e.g. 'auth.log' or 'ids'"
+          },
+          "payload": {
+            "type": "object",
+            "title": "Payload",
+            "description": "Structured event fields"
+          }
+        },
+        "type": "object",
+        "required": [
+          "source",
+          "payload"
+        ],
+        "title": "EventIn"
+      },
+      "HTTPValidationError": {
+        "properties": {
+          "detail": {
+            "items": {
+              "$ref": "#/components/schemas/ValidationError"
+            },
+            "type": "array",
+            "title": "Detail"
+          }
+        },
+        "type": "object",
+        "title": "HTTPValidationError"
+      },
+      "OSVQueryIn": {
+        "properties": {
+          "package": {
+            "type": "string",
+            "title": "Package",
+            "description": "Package name, e.g. 'requests'"
+          },
+          "version": {
+            "type": "string",
+            "title": "Version",
+            "description": "Version, e.g. '2.30.0'"
+          },
+          "ecosystem": {
+            "type": "string",
+            "title": "Ecosystem",
+            "description": "Ecosystem, e.g. PyPI, npm, Maven",
+            "default": "PyPI"
+          }
+        },
+        "type": "object",
+        "required": [
+          "package",
+          "version"
+        ],
+        "title": "OSVQueryIn"
+      },
+      "PasswordIn": {
+        "properties": {
+          "password": {
+            "type": "string",
+            "minLength": 1,
+            "title": "Password",
+            "description": "Password to check"
+          }
+        },
+        "type": "object",
+        "required": [
+          "password"
+        ],
+        "title": "PasswordIn"
+      },
+      "ValidationError": {
+        "properties": {
+          "loc": {
+            "items": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "integer"
+                }
+              ]
+            },
+            "type": "array",
+            "title": "Location"
+          },
+          "msg": {
+            "type": "string",
+            "title": "Message"
+          },
+          "type": {
+            "type": "string",
+            "title": "Error Type"
+          }
+        },
+        "type": "object",
+        "required": [
+          "loc",
+          "msg",
+          "type"
+        ],
+        "title": "ValidationError"
+      }
+    }
+  }
+}
