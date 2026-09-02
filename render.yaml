@@ -1,0 +1,12 @@
+services:
+  - type: web
+    name: secapi
+    runtime: docker
+    plan: free
+    dockerfilePath: ./Dockerfile
+    healthCheckPath: /health
+    envVars:
+      - key: SECAPI_EXPECTED_RAPIDAPI_HOST
+        value: ""
+      - key: SECAPI_ABUSEIPDB_API_KEY
+        value: ""

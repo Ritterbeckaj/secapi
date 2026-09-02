@@ -1,0 +1,12 @@
+services:
+  secapi:
+    build: .
+    container_name: secapi
+    ports:
+      - "8000:8000"
+    environment:
+      # --- RapidAPI marketplace gate (set when deployed: "secapi.p.rapidapi.com") ---
+      - SECAPI_EXPECTED_RAPIDAPI_HOST=
+      # --- Optional live integrations ---
+      - SECAPI_ABUSEIPDB_API_KEY=
+    restart: unless-stopped
