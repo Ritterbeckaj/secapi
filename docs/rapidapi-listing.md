@@ -9,73 +9,45 @@ Paste-ready content for the RapidAPI "Create API" form.
 - **API Name**: SecAPI — Cybersecurity Intelligence & Analysis
 - **URL slug** (auto): `secapi`
 - **Category**: Security
-- **URL**: your Render URL, e.g. `https://secapi.onrender.com`
+- **URL**: `https://cybersecurity-api-3axs.onrender.com`
 
 ---
 
 ## Short description (subtitle)
 
-> Five RESTful security APIs in one: password breach intelligence, CVE /
-> dependency scanning, IOC enrichment, log correlation & alerting, and
-> document static analysis.
+> Five production-ready cybersecurity REST APIs in one: password breach
+> intelligence, CVE/dependency scanning, IOC enrichment, threat-log
+> correlation & alerting, and document static analysis.
 
 ---
 
 ## Full description (paste into the description box)
 
 ```
-Five production-ready REST APIs that solve the most common cybersecurity
-pain points — no data leaves your client unnecessarily, everything is
-automated and developer-friendly.
+Five production-ready REST APIs that cover the day-to-day needs of security
+teams and developers — automated, lightweight, and free of unnecessary data
+exposure.
 
-WHAT'S INCLUDED
+Password breach checks run k-anonymously: only the first five characters of a
+password's SHA-1 hash are sent, so the full password never leaves your system.
+Results come from the real HIBP Pwned Passwords dataset.
 
-1. Password & Breach Intelligence
-   - k-anonymity breach lookup: check if a password has appeared in a known
-     breach WITHOUT ever transmitting the full password or hash (only the
-     first 5 chars of its SHA-1 are sent). Backed by the real HIBP Pwned
-     Passwords dataset.
-   - Local password strength scoring (never transmitted or stored).
+CVE and dependency scanning accepts your requirements.txt or package.json,
+flags packages with known CVEs, and queries Google's live OSV.dev database for
+ecosystem-aware advisories.
 
-2. CVE / Dependency Scanning
-   - Scan your own requirements.txt / package.json manifests for packages
-     with known CVEs.
-   - Look up CVEs by ID, list CVEs keyword-filtered, and query Google's live
-     OSV.dev database for ecosystem-aware advisories (PyPI, npm, Maven, ...).
+IOC enrichment resolves hashes, IP addresses, and URLs against threat
+intelligence, and computes file hashes on the fly.
 
-3. IOC / Indicator Enrichment
-   - Enrich hashes (MD5/SHA1/SHA256), IP addresses, and URLs against threat
-     intelligence.
-   - Compute hashes of uploaded files on the fly.
-   - Optional live AbuseIPDB integration (bring your own API key).
+Threat-log correlation ingests security events and raises real-time alerts
+from a built-in rule engine — brute-force attempts, known-bad files, privilege
+escalation, and data exfiltration.
 
-4. Threat Log Correlation & Alerting
-   - Ingest security events (single or batch) and get near-real-time alerts
-     from a built-in rule engine: brute-force detection, known-bad hashes,
-     privilege escalation, and data-exfiltration patterns.
-   - Query ingested events and raised alerts.
+Document analysis performs static, non-executing triage of PDFs, Office files,
+and scripts, returning a 0–100 risk score plus extracted indicators.
 
-5. Document / Malware Static Analysis
-   - Static (non-executing) triage of suspicious PDFs / Office docs / scripts.
-   - Detects embedded macros, PowerShell/VBA trigger keywords, embedded URLs,
-     emails, and IPs; computes hashes; outputs a 0-100 risk score — so analysts
-     know whether a file is safe to open before opening it.
-
-WHY DEVELOPERS LIKE IT
-- Clean, documented OpenAPI spec (/openapi.json)
-- Sensitive inputs (passwords) travel in request bodies, never in URLs
-- Optional RapidAPI-host gate prevents direct (non-marketplace) abuse
-- Stateless, container-friendly, deploys anywhere
-
-SECURITY & PRIVACY
-- Passwords are checked k-anonymously and never stored.
-- Document analysis never executes payloads (static only).
-- Threat-feed data is enriched client-aggregated; bring-your-own-keys for
-  live AbuseIPDB lookups.
-
-Note: the bundled local CVE/IOC datasets are curated samples. For the most
-current data, use the live OSV.dev queries and the HIBP range API (already
-wired in).
+Clean OpenAPI spec. Password-sensitive inputs stay out of URLs. Stateless and
+container-friendly.
 ```
 
 ---
